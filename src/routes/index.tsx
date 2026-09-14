@@ -1,24 +1,150 @@
 import { createFileRoute } from "@tanstack/react-router";
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  Banknote,
+  Bike,
+  Droplet,
+  Home,
+  Repeat,
+  Settings,
+  User,
+  Zap,
+} from "lucide-react";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Catatan Keuangan Dian — Ringkasan Harian" },
+      {
+        name: "description",
+        content:
+          "Pantau transaksi terbaru, tagihan bulanan, pendapatan bersih, dan saldo wallet serta cash dalam satu tampilan sederhana.",
+      },
+      { property: "og:title", content: "Catatan Keuangan Dian — Ringkasan Harian" },
+      {
+        property: "og:description",
+        content:
+          "Transaksi terbaru, tagihan bulanan, dan ringkasan uang dalam satu halaman mobile-first.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
+const transactions = [
+  { name: "Drivers Shopee", total: "Rp. 10.000" },
+  { name: "Keperluan Ayah", total: "Rp. 10.000" },
+  { name: "Keperluan Ibu", total: "Rp. 10.000" },
+];
+
+const bills = [
+  { name: "Sepeda", icon: Bike, cycle: "31", total: "Rp. 390.000" },
+  { name: "Air", icon: Droplet, cycle: "28", total: "Rp. 390.000" },
+  { name: "Listrik", icon: Zap, cycle: "25", total: "Rp. 390.000" },
+];
+
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="min-h-screen bg-background font-sans">
+      <div className="mx-auto min-h-screen w-full max-w-[480px] pb-28">
+        <header className="flex items-center gap-3 rounded-b-2xl bg-surface px-5 py-6 shadow-card">
+          <div className="flex size-11 items-center justify-center rounded-full bg-primary">
+            <User className="size-5 text-primary-foreground" />
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Selamat Datang Kembali</p>
+            <p className="text-xl font-bold text-foreground">Dian</p>
+          </div>
+        </header>
+
+        <main className="space-y-4 px-4 pt-4">
+          <section className="space-y-3 rounded-2xl bg-surface p-4 shadow-card">
+            {transactions.map((t) => (
+              <div key={t.name} className="rounded-xl border border-border p-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold text-foreground">{t.name}</p>
+                  <p className="text-sm font-semibold text-foreground">{t.total}</p>
+                </div>
+                <div className="mt-2 flex items-center justify-between text-[12px]">
+                  <span className="flex items-center gap-1 text-income">
+                    <ArrowUpRight className="size-3.5" />
+                    Pemasukan Rp. 10.000
+                  </span>
+                  <span className="flex items-center gap-1 text-expense">
+                    <ArrowDownRight className="size-3.5" />
+                    Pengeluaran Rp. 10.000
+                  </span>
+                </div>
+              </div>
+            ))}
+          </section>
+
+          <section className="rounded-2xl bg-surface p-4 shadow-card">
+            <h2 className="text-base font-bold text-foreground">Tagihan Bulanan</h2>
+            <div className="mt-3">
+              {bills.map((b, i) => (
+                <div
+                  key={b.name}
+                  className={`flex items-center gap-3 py-3 ${
+                    i < bills.length - 1 ? "border-b border-border" : ""
+                  }`}
+                >
+                  <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
+                    <b.icon className="size-5 text-foreground" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-foreground">{b.name}</p>
+                    <p className="text-[12px] text-muted-foreground">
+                      Kurang Rp. 20.000 • <span className="text-expense">10 Hari Lagi</span>
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span className="flex items-center justify-end gap-1 text-[12px] text-muted-foreground">
+                      <Repeat className="size-3.5" />
+                      {b.cycle}
+                    </span>
+                    <p className="text-sm font-bold text-foreground">{b.total}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="rounded-2xl bg-surface p-5 text-center shadow-card">
+            <p className="text-sm font-medium text-muted-foreground">Pendapatan Bersih Driver</p>
+            <p className="mt-1 text-2xl font-bold text-foreground">Rp. 50.000</p>
+          </section>
+
+          <section className="mb-8 rounded-2xl bg-surface p-5 shadow-card">
+            <h2 className="flex items-center justify-center gap-2 text-base font-bold text-foreground">
+              <Banknote className="size-5" />
+              Ringkasan Uang
+            </h2>
+            <div className="mt-4 grid grid-cols-2 divide-x divide-border">
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">Wallet</p>
+                <p className="mt-1 font-bold text-foreground">Rp. 100.000</p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground">Cash</p>
+                <p className="mt-1 font-bold text-foreground">Rp. 100.000</p>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <nav className="fixed bottom-0 left-1/2 flex w-full max-w-[480px] -translate-x-1/2 justify-between rounded-t-2xl bg-surface px-12 py-4 shadow-nav">
+          <button aria-label="Beranda" className="text-primary">
+            <Home className="size-6" />
+          </button>
+          <button aria-label="Pengaturan" className="text-muted-foreground">
+            <Settings className="size-6" />
+          </button>
+        </nav>
+      </div>
     </div>
   );
 }
