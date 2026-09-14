@@ -5,12 +5,15 @@ import {
   Banknote,
   Bike,
   Droplet,
-  Home,
+  Receipt,
   Repeat,
-  Settings,
   User,
+  Wallet,
   Zap,
 } from "lucide-react";
+import { BottomNav } from "@/components/BottomNav";
+import { EmptyState } from "@/components/EmptyState";
+import { formatDate, formatDateTime } from "@/lib/format";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -35,15 +38,15 @@ export const Route = createFileRoute("/")({
 });
 
 const transactions = [
-  { name: "Drivers Shopee", total: "Rp. 10.000" },
-  { name: "Keperluan Ayah", total: "Rp. 10.000" },
-  { name: "Keperluan Ibu", total: "Rp. 10.000" },
+  { name: "Drivers Shopee", total: "Rp. 10.000", at: "2026-09-14T09:15:00+07:00" },
+  { name: "Keperluan Ayah", total: "Rp. 10.000", at: "2026-09-13T19:40:00+07:00" },
+  { name: "Keperluan Ibu", total: "Rp. 10.000", at: "2026-09-12T08:05:00+07:00" },
 ];
 
 const bills = [
-  { name: "Sepeda", icon: Bike, cycle: "31", total: "Rp. 390.000" },
-  { name: "Air", icon: Droplet, cycle: "28", total: "Rp. 390.000" },
-  { name: "Listrik", icon: Zap, cycle: "25", total: "Rp. 390.000" },
+  { name: "Sepeda", icon: Bike, cycle: "31", total: "Rp. 390.000", due: "2026-09-24" },
+  { name: "Air", icon: Droplet, cycle: "28", total: "Rp. 390.000", due: "2026-09-24" },
+  { name: "Listrik", icon: Zap, cycle: "25", total: "Rp. 390.000", due: "2026-09-24" },
 ];
 
 function Index() {
@@ -62,54 +65,74 @@ function Index() {
 
         <main className="space-y-4 px-4 pt-4">
           <section className="space-y-3 rounded-2xl bg-surface p-4 shadow-card">
-            {transactions.map((t) => (
-              <div key={t.name} className="rounded-xl border border-border p-3">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-semibold text-foreground">{t.name}</p>
-                  <p className="text-sm font-semibold text-foreground">{t.total}</p>
+            {transactions.length === 0 ? (
+              <EmptyState
+                icon={Receipt}
+                title="Belum ada transaksi"
+                description="Transaksi terbaru kamu akan muncul di sini."
+              />
+            ) : (
+              transactions.map((t) => (
+                <div key={t.name} className="rounded-xl border border-border p-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold text-foreground">{t.name}</p>
+                    <p className="text-sm font-semibold text-foreground">{t.total}</p>
+                  </div>
+                  <p className="mt-1 text-[12px] text-muted-foreground">{formatDateTime(t.at)}</p>
+                  <div className="mt-2 flex items-center justify-between text-[12px]">
+                    <span className="flex items-center gap-1 text-income">
+                      <ArrowUpRight className="size-3.5" />
+                      Pemasukan Rp. 10.000
+                    </span>
+                    <span className="flex items-center gap-1 text-expense">
+                      <ArrowDownRight className="size-3.5" />
+                      Pengeluaran Rp. 10.000
+                    </span>
+                  </div>
                 </div>
-                <div className="mt-2 flex items-center justify-between text-[12px]">
-                  <span className="flex items-center gap-1 text-income">
-                    <ArrowUpRight className="size-3.5" />
-                    Pemasukan Rp. 10.000
-                  </span>
-                  <span className="flex items-center gap-1 text-expense">
-                    <ArrowDownRight className="size-3.5" />
-                    Pengeluaran Rp. 10.000
-                  </span>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </section>
 
           <section className="rounded-2xl bg-surface p-4 shadow-card">
             <h2 className="text-base font-bold text-foreground">Tagihan Bulanan</h2>
             <div className="mt-3">
-              {bills.map((b, i) => (
-                <div
-                  key={b.name}
-                  className={`flex items-center gap-3 py-3 ${
-                    i < bills.length - 1 ? "border-b border-border" : ""
-                  }`}
-                >
-                  <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
-                    <b.icon className="size-5 text-foreground" />
+              {bills.length === 0 ? (
+                <EmptyState
+                  icon={Wallet}
+                  title="Belum ada tagihan"
+                  description="Tambahkan tagihan rutin agar tidak terlewat."
+                />
+              ) : (
+                bills.map((b, i) => (
+                  <div
+                    key={b.name}
+                    className={`flex items-center gap-3 py-3 ${
+                      i < bills.length - 1 ? "border-b border-border" : ""
+                    }`}
+                  >
+                    <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
+                      <b.icon className="size-5 text-foreground" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-foreground">{b.name}</p>
+                      <p className="text-[12px] text-muted-foreground">
+                        Kurang Rp. 20.000 • <span className="text-expense">10 Hari Lagi</span>
+                      </p>
+                      <p className="text-[12px] text-muted-foreground">
+                        Jatuh tempo {formatDate(b.due)}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <span className="flex items-center justify-end gap-1 text-[12px] text-muted-foreground">
+                        <Repeat className="size-3.5" />
+                        {b.cycle}
+                      </span>
+                      <p className="text-sm font-bold text-foreground">{b.total}</p>
+                    </div>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-foreground">{b.name}</p>
-                    <p className="text-[12px] text-muted-foreground">
-                      Kurang Rp. 20.000 • <span className="text-expense">10 Hari Lagi</span>
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <span className="flex items-center justify-end gap-1 text-[12px] text-muted-foreground">
-                      <Repeat className="size-3.5" />
-                      {b.cycle}
-                    </span>
-                    <p className="text-sm font-bold text-foreground">{b.total}</p>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </section>
 
@@ -136,14 +159,7 @@ function Index() {
           </section>
         </main>
 
-        <nav className="fixed bottom-0 left-1/2 flex w-full max-w-[480px] -translate-x-1/2 justify-between rounded-t-2xl bg-surface px-12 py-4 shadow-nav">
-          <button aria-label="Beranda" className="text-primary">
-            <Home className="size-6" />
-          </button>
-          <button aria-label="Pengaturan" className="text-muted-foreground">
-            <Settings className="size-6" />
-          </button>
-        </nav>
+        <BottomNav />
       </div>
     </div>
   );
